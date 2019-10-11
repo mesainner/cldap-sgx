@@ -32,7 +32,6 @@ impl Ldap {
         let result = self.data_decode(&mut dde);
         let is_ok = match result {
             Some(tag) => {
-                println!("xxxx");
                 let i = tag.expect_constructed().unwrap();
                 if i[0] == Tag::Integer(Integer {
                     id: 10,
