@@ -8,7 +8,11 @@ extern crate sgx_tstd as std;
 
 extern crate asnom;
 extern crate byteorder;
+extern crate webpki;
+extern crate rustls;
+extern crate mio;
 
 mod ldap;
 mod bind;
+mod tls;
 pub use ldap::Ldap;

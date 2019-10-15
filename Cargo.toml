@@ -10,11 +10,15 @@ repository = "https://github.com/dequbed/rust-ldap"
 version = "0.4.0"
 
 [features]
-default = ["mesalock_sgx", "std"]
-mesalock_sgx = ["std","sgx_tstd"]
-std = ["mesalock_sgx"]
+default         = ["mesalock_sgx", "std"]
+mesalock_sgx    = ["std","sgx_tstd"]
+std             = ["mesalock_sgx"]
 
 [dependencies]
-sgx_tstd    = { rev = "v1.0.9", git = "https://github.com/baidu/rust-sgx-sdk.git", features = ["net"], optional = true }
-asnom         = { git = "https://github.com/renxingliang/asnom-sgx.git" }
+sgx_tstd    = { rev = "v1.0.9", git = "https://github.com/baidu/rust-sgx-sdk.git", optional = true }
+asnom       = { git = "https://github.com/renxingliang/asnom-sgx.git" }
 byteorder   = { git = "https://github.com/mesalock-linux/byteorder-sgx" }
+mio         = { git = "https://github.com/mesalock-linux/mio-sgx", branch = "v0.6.19_sgx1.0.8" }
+rustls      = { git = "https://github.com/mesalock-linux/rustls", branch = "mesalock_sgx" }
+webpki      = { git = "https://github.com/mesalock-linux/webpki", branch = "mesalock_sgx" }
+log         = { git = "https://github.com/mesalock-linux/log-sgx" }

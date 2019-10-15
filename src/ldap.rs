@@ -1,8 +1,6 @@
-use std::net::SocketAddr;
 use std::prelude::v1::*;
-use std::net::TcpStream;
+use mio::net::TcpStream;
 use std::io::Result;
-
 use std::io::{Write, Read};
 
 use asnom::structures::{Tag, Sequence, Integer};
@@ -18,21 +16,43 @@ use asnom::Input;
 use asnom::Consumer;
 use asnom::parse::parse_uint;
 
+use tls::*;
+use webpki::DNSNameRef;
+
 pub struct Ldap {
-    sock: TcpStream
+    sock: TlsClient
 }
 
 impl Ldap {
-    pub fn connect(addr: &SocketAddr) -> Self {
-        let socket = TcpStream::connect(&addr);
+    pub fn connect(addr: &str, cert: &str) -> Self {
+
+        let sock_addr = addr.parse().unwrap();
+        let socket = TcpStream::connect(&sock_addr).unwrap();
+        let config = make_config(cert);
+        let dns_name = webpki::DNSNameRef::try_from_ascii_str(addr).unwrap();
+
         Ldap { 
-            sock: socket.unwrap()
+            sock: TlsClient::new(socket, dns_name, config)
         }
     }
 
     pub fn send(&mut self, req: Tag) -> std::io::Result<Vec<u8>> {
         let mut into: Vec<u8> = Vec::new();
         self.data_encode(req, &mut into).unwrap();
+
+        self.sock.write_all(&into).unwrap();
+        let mut poll = mio::Poll::new().unwrap();
+        let mut events = mio::Events::with_capacity(32);
+        self.sock.register(&mut poll);
+
+        'outer: loop {
+            poll.poll(&mut events, None).unwrap();
+            for ev in events.iter() {
+                if !self.sock.ready(&mut poll, &ev) {
+                    break 'outer ;
+                }
+            }
+        }
 
         let write_len = self.sock.write(&into).unwrap();
         self.sock.flush()?;
