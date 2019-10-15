@@ -24,12 +24,15 @@ pub struct Ldap {
 }
 
 impl Ldap {
-    pub fn connect(addr: &str, cert: &str) -> Self {
+    pub fn connect( addr: &str, cert: &str) -> Self {
 
         let sock_addr = addr.parse().unwrap();
         let socket = TcpStream::connect(&sock_addr).unwrap();
         let config = make_config(cert);
-        let dns_name = webpki::DNSNameRef::try_from_ascii_str(addr).unwrap();
+
+        let domain = addr.split(':').next().expect("hostname");
+        println!("domain: {:?}", &domain);
+        let dns_name = webpki::DNSNameRef::try_from_ascii_str(domain).unwrap();
 
         Ldap { 
             sock: TlsClient::new(socket, dns_name, config)
