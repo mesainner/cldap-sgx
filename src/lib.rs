@@ -15,4 +15,5 @@ extern crate mio;
 mod ldap;
 mod bind;
 mod tls;
+mod protocol;
 pub use ldap::Ldap;

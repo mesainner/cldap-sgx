@@ -3,6 +3,7 @@ use asnom::structures::OctetString;
 use asnom::common::TagClass::*;
 use asnom::structures::{Tag, Integer, Sequence, ASNTag};
 use std::prelude::v1::String;
+use protocol::Protocol;
 
 use ldap::Ldap;
 
@@ -29,7 +30,7 @@ impl Ldap {
         });
 
         let mut dde = self.send(req).unwrap();
-        let result = self.data_decode(&mut dde);
+        let result = Protocol.data_decode(&mut dde);
         let is_ok = match result {
             Some(tag) => {
                 let i = tag.expect_constructed().unwrap();
